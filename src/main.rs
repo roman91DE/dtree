@@ -17,7 +17,7 @@ fn main() {
                 .short('L')
                 .long("level")
                 .help("Limit the depth of the directory tree")
-                .default_value("2")
+                .default_value("100")
                 .value_parser(clap::value_parser!(usize)),
         )
         .arg(
@@ -27,23 +27,24 @@ fn main() {
                 .help("Show hidden files")
                 .action(ArgAction::SetTrue),
         )
-        // .arg(
-        //     Arg::new("full_path")
-        //         .short('f')
-        //         .long("full-path")
-        //         .help("Print the full path prefix for each file")
-        //         .action(ArgAction::SetTrue),
-        // )
+        .arg(
+            Arg::new("directories_only")
+                .short('d')
+                .long("dirs_only")
+                .help("Only show Directories")
+                .action(ArgAction::SetTrue),
+        )
         .get_matches();
 
     // Parsing values
     let directory = matches.get_one::<String>("directory").unwrap();
     let level = *matches.get_one::<usize>("level").unwrap_or(&2);
     let show_hidden = matches.get_flag("show_hidden");
-    let full_path = matches.get_flag("full_path");
+    let dirs_only = matches.get_flag("directories_only");
+    // let full_path = matches.get_flag("full_path");
 
     // Initialize dtree::Args
-    let args = dtree::Args::new(directory, level, show_hidden, full_path)
+    let args = dtree::Args::new(directory, level, dirs_only, show_hidden)
         .expect("Couldn't parse arguments");
 
     // Run the program

@@ -27,7 +27,21 @@ impl Args {
 
 pub fn run(args: &Args) {
     println!(".");
-    walk(&args.root_dir, 0, args.depth, args.dirs_only, args.include_hidden);
+
+    let mut dir_count = 1;
+    let mut file_count = 0;
+
+    walk(
+        &args.root_dir,
+        0,
+        args.depth,
+        args.dirs_only,
+        args.include_hidden,
+        &mut dir_count,
+        &mut file_count,
+    );
+
+    println!("\n{} directories, {} files", dir_count, file_count);
 }
 
 fn walk(
@@ -36,6 +50,8 @@ fn walk(
     max_indent: usize,
     dirs_only: bool,
     include_hidden: bool,
+    dir_count: &mut usize,
+    file_count: &mut usize,
 ) {
     if indent_level >= max_indent {
         return; // Stop recursion if max_indent is reached
@@ -67,6 +83,7 @@ fn walk(
                 let branch = if i == total_entries - 1 { "└── " } else { "├── " };
 
                 if filetype.is_dir() {
+                    *dir_count += 1; // Increment directory count
                     let dir_str = file_name.to_str().unwrap();
                     println!("{}{}{}", indent_str, branch, dir_str);
 
@@ -77,8 +94,11 @@ fn walk(
                         max_indent,
                         dirs_only,
                         include_hidden,
+                        dir_count,
+                        file_count,
                     );
                 } else if !dirs_only {
+                    *file_count += 1; // Increment file count
                     let file_str = file_name.to_str().unwrap();
                     println!("{}{}{}", indent_str, branch, file_str);
                 }
@@ -90,4 +110,3 @@ fn walk(
         eprintln!("Failed to read directory: {:?}", node);
     }
 }
-
