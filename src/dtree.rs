@@ -26,50 +26,68 @@ impl Args {
 }
 
 pub fn run(args: &Args) {
+    println!(".");
     walk(&args.root_dir, 0, args.depth, args.dirs_only, args.include_hidden);
 }
 
-fn walk(node: &std::path::PathBuf, indent_level: usize, max_indent: usize, dirs_only: bool, include_hidden: bool) {
+fn walk(
+    node: &std::path::PathBuf,
+    indent_level: usize,
+    max_indent: usize,
+    dirs_only: bool,
+    include_hidden: bool,
+) {
     if indent_level >= max_indent {
         return; // Stop recursion if max_indent is reached
     }
 
     if let Ok(entries) = std::fs::read_dir(node) {
-        for entry_result in entries {
-            match entry_result {
-                Ok(entry) => {
-                    let file_name = entry.file_name();
-                    let file_name_str = file_name.to_string_lossy();
+        let mut entries: Vec<_> = entries.filter_map(|e| e.ok()).collect();
+        entries.sort_by_key(|entry| entry.file_name()); // Sort entries alphabetically
 
-                    // Skip hidden files if `include_hidden` is false
-                    if !include_hidden && file_name_str.starts_with('.') {
-                        continue;
-                    }
+        let total_entries = entries.len();
+        for (i, entry) in entries.into_iter().enumerate() {
+            let file_name = entry.file_name();
+            let file_name_str = file_name.to_string_lossy();
 
-                    // Determine the file type
-                    if let Ok(filetype) = entry.file_type() {
-                        // Print the current entry with indentation
-                        for _ in 0..indent_level {
-                            print!(" ");
-                        }
+            // Skip hidden files if `include_hidden` is false
+            if !include_hidden && file_name_str.starts_with('.') {
+                continue;
+            }
 
-                        if filetype.is_dir() {
-                            println!("{:?}", file_name);
-                            // Recursively walk into the directory
-                            walk(&entry.path(), indent_level + 1, max_indent, dirs_only, include_hidden);
-                        } else if !dirs_only {
-                            println!("{:?}", file_name);
-                        }
-                    } else {
-                        eprintln!("Could not determine file type for: {:?}", file_name);
-                    }
+            // Determine the file type
+            if let Ok(filetype) = entry.file_type() {
+                // Build the indentation string
+                let mut indent_str = String::new();
+                for _ in 0..indent_level {
+                    indent_str.push_str("│   ");
                 }
-                Err(e) => {
-                    eprintln!("Failed to process entry: {}", e);
+
+                // Choose the appropriate branch character
+                let branch = if i == total_entries - 1 { "└── " } else { "├── " };
+
+                if filetype.is_dir() {
+                    let dir_str = file_name.to_str().unwrap();
+                    println!("{}{}{}", indent_str, branch, dir_str);
+
+                    // Recursively walk the directory
+                    walk(
+                        &entry.path(),
+                        indent_level + 1,
+                        max_indent,
+                        dirs_only,
+                        include_hidden,
+                    );
+                } else if !dirs_only {
+                    let file_str = file_name.to_str().unwrap();
+                    println!("{}{}{}", indent_str, branch, file_str);
                 }
+            } else {
+                eprintln!("Could not determine file type for: {:?}", file_name);
             }
         }
     } else {
         eprintln!("Failed to read directory: {:?}", node);
     }
 }
+

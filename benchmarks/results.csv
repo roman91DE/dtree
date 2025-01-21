@@ -1,0 +1,17 @@
+Directory,Program,Arguments,Time(s),Memory(KB),OutputMatch
+/Users/roman/Repos/dtree,dtree,,0.1828749179840088,0,Mismatch
+/Users/roman/Repos/dtree,tree,,0.03386807441711426,0,-
+/Users/roman/Repos/dtree,dtree,-L 2,0.008013725280761719,0,Mismatch
+/Users/roman/Repos/dtree,tree,-L 2,0.007323026657104492,0,-
+/Users/roman/Repos/dtree,dtree,-a,0.006520271301269531,0,Mismatch
+/Users/roman/Repos/dtree,tree,-a,0.025494098663330078,0,-
+/Users/roman/Repos/dtree,dtree,-L 3 -a -f,0.00710296630859375,0,Mismatch
+/Users/roman/Repos/dtree,tree,-L 3 -a -f,0.007052898406982422,0,-
+/Users/roman,dtree,,0.006017923355102539,0,Mismatch
+/Users/roman,tree,,5.107338905334473,0,-
+/Users/roman,dtree,-L 2,0.07791876792907715,0,Mismatch
+/Users/roman,tree,-L 2,0.01380610466003418,0,-
+/Users/roman,dtree,-a,0.006745100021362305,0,Mismatch
+/Users/roman,tree,-a,7.723866701126099,0,-
+/Users/roman,dtree,-L 3 -a -f,0.018594026565551758,0,Mismatch
+/Users/roman,tree,-L 3 -a -f,0.15393567085266113,0,-
